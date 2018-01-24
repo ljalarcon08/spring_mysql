@@ -29,7 +29,7 @@
 			    	<th scope="col">Year</th>
 			    	<th scope="col">Rating</th>
 			    	<th scope="col">Image</th>
-			    	<th class="text-center" scope="col" colspan="2"><a class="btn btn-success" th:href="@{'/test/find'}">Nuevo</a></th>
+			    	<th class="text-center" scope="col" colspan="2"><a class="btn btn-success" th:href="@{'/find'}">Nuevo</a></th>
 		    	</tr>
 		    	<tr th:each="movie :${list}">
 			    	<td th:text="${movie.movieid}"></td>
@@ -38,10 +38,10 @@
 			    	<td th:text="${movie.rating}"></td>
 			    	<td><img th:src="${movie.image}"/></td>
 			    	<td>
-			    		<a class="btn btn-primary" th:href="@{'/test/edit'(movieid=${movie.movieid})}">Actualizar</a>
+			    		<a class="btn btn-primary" th:href="@{'/edit'(movieid=${movie.movieid})}">Actualizar</a>
 			    	</td>
 			    	<td>
-			    		<form method="post" th:action="@{'/test/del'(movieid=${movie.movieid})}">
+			    		<form method="post" th:action="@{'/del'(movieid=${movie.movieid})}">
 			    			<!--<input type="hidden" name="movieid" th:value="${movie.movieid}"></input>-->
 			    			<input class="btn btn-danger" type="button" value="Eliminar" onclick="eliminar(this)"></input>
 			    			<input type="hidden" name="_method" value="DELETE"></input>
