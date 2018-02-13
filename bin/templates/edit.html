@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="UTF-8">
+	<head>
+	    <title>Editar</title>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+	    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+	    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous"/>
+	    <link href="../static/css/style.css" rel="stylesheet" th:href="@{/css/style.css}" />
+	</head>
+	<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	  <a class="navbar-brand" href="/list">Movies</a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+		<ul class="navbar-nav mr-auto">
+		      <li class="nav-item active">
+		      </li>
+		</ul>		  
+		  <form class="form-inline my-2 my-lg-0" th:action="@{'/findTitle'}">
+		      <input class="form-control mr-sm-2" name="title" type="search" placeholder="Title" aria-label="Search"></input>
+		      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+	      </form>
+      </div>
+	</nav>
+		<div class="container">
+		   	<form method="post" th:action="@{'/update'}">
+		   		<fieldset>
+				   	<div class="form-group row">
+					   	<label id="descriptor" class="col-2 col-form-label">ID:</label>
+					   	<div class="col-8">
+						   	<input class="form-control" name="movieid_disabled" type="text" disabled="disabled" th:value="${movie.movieid}"></input>
+						   	<input name="movieid" type="hidden" required="required" th:value="${movie.movieid}"></input>
+				   		</div>
+				   	</div>
+				   	<div class="form-group row">
+					   	<label id="descriptor" class="col-2 col-form-label">TITLE:</label>
+					   	<div class="col-8">
+					   		<input class="form-control" name="title" type="text" required="required" th:value="${movie.title}"></input>
+						</div>
+					</div>
+					<div class="form-group row">
+					   	<label id="descriptor" class="col-2 col-form-label">YEAR:</label>
+					   	<div class="col-8">
+						   	<input class="form-control" name="release_year" type="text" required="required" th:value="${movie.release_year}"></input>
+						</div>
+				   	</div>
+				   	<div class="form-group row">
+					   	<label id="descriptor" class="col-2 col-form-label">RATING:</label>
+					   	<div class="col-8">
+					   		<input class="form-control" name="rating" type="text" required="required" th:value="${movie.rating}"></input>
+				   		</div>
+				   	</div>
+				   	<div class="form-group row">
+					   	<label id="descriptor" class="col-2 col-form-label">IMAGE:</label>
+					   	<div class="col-8">
+					   		<input class="form-control" name="image" type="text" required="required" th:value="${movie.image}"></input>
+				   		</div>
+				   	</div>
+				   	<div class="form-group">
+			   				<input name="_method" type="hidden" value="PUT" />
+			   				<input class="btn btn-primary" type="submit" value="Edit"></input>
+					</div>
+			   	</fieldset>
+		   	</form>
+		 </div>
+		<footer>
+		    <div class="container">
+			  <p>Posted by: Me</p>
+		  	  <p>Contact information: <a href="mailto:alarcon08@gmail.com">
+		  		alarcon08@gmail.com</a>.</p>
+		    </div>
+	    </footer>
+	</body>
+</html>

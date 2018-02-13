@@ -1,0 +1,50 @@
+.jumbotron{
+	background-color: #333;
+	padding-bottom: 1rem;
+}
+.display-3{
+	color:#DDD;
+	padding-left: 1em;
+}
+.lead{
+	color:#096;
+	padding-left: 5em;
+	font-style: italic;
+}
+body{
+	background-color: #444;
+}
+img
+{
+    width:40%;/*adjust this value to your needs*/
+    max-width: the size of the image;/* so it wont get bigger and pixelated*/
+    height:auto;
+}
+footer{
+  color:#DDD;
+  background-color: #333;
+  height: 100%;
+  padding: 0;
+  width: 100%;
+  position: relative; 
+}
+#descriptor{
+	color:#DDD;
+}
+#glosa{
+	color:#DDD;
+	font-size: 10px;
+}
+.navbar-dark .navbar-brand{
+	color:lime;
+	font-size: 2em;
+	font-family: verdana;
+}
+#spinner{
+	font-size: 24px;
+	color: white;
+}
+#wait{
+	text-align:center; 
+    vertical-align:middle;
+}
