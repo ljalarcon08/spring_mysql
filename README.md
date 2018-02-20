@@ -2,7 +2,7 @@
 
 Project made with spring tool suite
 
-Database connection: application.properties
+Database connection, hibernate index location: application.properties
 
 Generate WAR:
 
