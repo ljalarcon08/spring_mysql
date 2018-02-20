@@ -2,7 +2,7 @@
 
 Project made with spring tool suite
 
-Database connection, hibernate index location: application.properties
+Database connection, hibernate index location: /src/main/resources/application.properties
 
 Generate WAR:
 
