@@ -15,4 +15,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'spring6warjunit'
+rootProject.name = 'spring_mysql'
