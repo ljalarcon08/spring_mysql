@@ -4,22 +4,23 @@ $(document).ready(function() {
 	// Each time the user scrolls
 	win.scroll(function() {
 		// Vertical end reached?
-		if (doc.height() - win.height() == win.scrollTop()) {
-			// New row
-			
-			
-			//console.log($( "#pageSizeSelect option:selected" ).text());
-			var countSize=5;
-			var rowCount = $('#table tr').length;
-			//console.log("REAL ROW COUNT:"+rowCount);
-			rowCount-=1;
-			//console.log("ROW:"+rowCount);
-			var page=(rowCount/countSize)+1|0;
-			//console.log("PAGE ROUND"+page);
-			putData(page,rowCount);
-			// Current number of columns to create
+		if($("#wait").length==0){
+			if (doc.height() - win.height() == win.scrollTop()) {
+				// New row
+				fired=true;
+				
+				//console.log($( "#pageSizeSelect option:selected" ).text());
+				var countSize=5;
+				var rowCount = $('#table tr').length;
+				//console.log("REAL ROW COUNT:"+rowCount);
+				rowCount-=1;
+				//console.log("ROW:"+rowCount);
+				var page=(rowCount/countSize)+1|0;
+				//console.log("PAGE ROUND"+page);
+				putData(page,rowCount);
+				// Current number of columns to create
+			}
 		}
-
 		// Horizontal end reached?
 		/*
 		if (doc.width() - win.width() == win.scrollLeft()) {
@@ -36,17 +37,14 @@ $(document).ready(function() {
 });
 
 function getContextPath() {
-	   //console.log(window.location.pathname);
-	   //console.log(window.location.pathname.replace("/list",""));
 	   return window.location.pathname.replace("/list","");
 	}
 
 function putData(page,rowCount){
 	var initial_path=getContextPath();
-	//console.log(initial_path);
 	var host=window.location.host;
 	var urlComplete='http://'+host+initial_path+"/jsonPage?pageSize=5&page="+page;
-	if(initial_path==="/findTitle"){
+	if(initial_path.includes("findTitle")){
 		//console.log(window.location.href);
 		var actualUrl=new URL(window.location.href);
 		urlComplete+="&title="+actualUrl.searchParams.get("title");

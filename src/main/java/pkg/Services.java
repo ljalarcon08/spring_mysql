@@ -49,6 +49,11 @@ public class Services {
 		this.movieService=service;
 	}
 	
+	@GetMapping(path="")
+	public ModelAndView redirect() {
+		return new ModelAndView("redirect:/list");
+	}
+	
 	@GetMapping(path="/all")
 	public @ResponseBody Iterable<Movie2> findall() {
 		return movieModel.findAll();

@@ -43,10 +43,10 @@ function getContextPath() {
 
 function putData(page,rowCount){
 	var initial_path=getContextPath();
-	//console.log(initial_path);
+	console.log(initial_path);
 	var host=window.location.host;
 	var urlComplete='http://'+host+initial_path+"/jsonPage?pageSize=5&page="+page;
-	if(initial_path==="/findTitle"){
+	if(initial_path.includes("findTitle")){
 		//console.log(window.location.href);
 		var actualUrl=new URL(window.location.href);
 		urlComplete+="&title="+actualUrl.searchParams.get("title");
