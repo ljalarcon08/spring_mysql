@@ -1,6 +1,7 @@
 package pkg;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class Services {
 
 	@Autowired
 	private MoviePaginationService movieService;
+	
+	@Autowired
+	private HibernateSearchService hibernateSearchService;
 	
 	public Services(MoviePaginationService service) {
 		this.movieService=service;
@@ -127,7 +131,8 @@ public class Services {
 		return modelAndView;
 	}	
 	
-	@RequestMapping("/findTitle")
+	//find titles in database
+	@RequestMapping("/findTitleold")
 	public @ResponseBody ModelAndView findListByTitle(@RequestParam("pageSize") Optional<Integer> pageSize,
 			@RequestParam("page") Optional<Integer>page,@RequestParam("title") String title) {
 		//ModelAndView modelAndView=new ModelAndView("findList");
@@ -144,10 +149,45 @@ public class Services {
 		return modelAndView;
 	}
 
-	@RequestMapping("/findTitle/jsonPage")
+	//findTitle in hibernate's index
+	@RequestMapping("/findTitle")
+	public @ResponseBody ModelAndView searchListByTitle(@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer>page,@RequestParam("title") String title) {
+		System.out.println(title);
+		int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
+		int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
+		Page<Movie2> movies = hibernateSearchService.titleIdSearchByPage(title, evalPage, evalPageSize);
+		ModelAndView modelAndView=new ModelAndView("findTitle");
+		Pager pager = new Pager(movies.getTotalPages(), movies.getNumber(), BUTTONS_TO_SHOW);		
+		modelAndView.addObject("list",movies);
+		modelAndView.addObject("selectedPageSize",evalPageSize);
+		modelAndView.addObject("pageSizes", PAGE_SIZES);
+		modelAndView.addObject("pager", pager);			
+		return modelAndView;
+	}	
+	
+	
+	@RequestMapping("/finder")
+	public @ResponseBody List<Movie2> findTitleId(@RequestParam("searched")String titleId){
+		try {
+			System.out.println(titleId);
+			List<Movie2> movies= hibernateSearchService.titleIdSearch(titleId);
+			if(movies.size()>0) {
+				return movies;
+			}
+			else {
+				return null;
+			}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return null;
+	}
+	
+	//find title in database
+	@RequestMapping("/findTitleold/jsonPage")
 	public @ResponseBody Page<Movie2> findListByTitleJson(@RequestParam("pageSize") Optional<Integer> pageSize,
 			@RequestParam("page") Optional<Integer>page,@RequestParam("title") String title) {
-		//ModelAndView modelAndView=new ModelAndView("findList");
 		System.out.println(title);
 		int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
 		int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
@@ -156,6 +196,18 @@ public class Services {
 		Pager pager = new Pager(movies.getTotalPages(), movies.getNumber(), BUTTONS_TO_SHOW);		
 		return movies;
 	}	
+
+	//find title in hibernate's index
+	@RequestMapping("/findTitle/jsonPage")
+	public @ResponseBody Page<Movie2> searchListByTitleJson(@RequestParam("pageSize") Optional<Integer> pageSize,
+			@RequestParam("page") Optional<Integer>page,@RequestParam("title") String title) {
+		System.out.println(title);
+		int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
+		int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
+		Page<Movie2> movies = hibernateSearchService.titleIdSearchByPage(title, evalPage, evalPageSize);
+		return movies;
+	}	
+	
 	
 	@GetMapping(path="/jsonPage",produces = "application/json")
 	public @ResponseBody Page<Movie2> jsonPage(@RequestParam("pageSize") Optional<Integer> pageSize,

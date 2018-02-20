@@ -264,7 +264,7 @@ public class JMovie {
 		this.response = response;
 	}
 
-	@Override
+	/*@Override
 	public String toString() {
 		return "JMovie [title=" + title + ", year=" + year + ", rated=" + rated + ", released=" + released
 				+ ", runtime=" + runtime + ", genre=" + genre + ", director=" + director + ", writer=" + writer
@@ -273,7 +273,7 @@ public class JMovie {
 				+ ", imdbRating=" + imdbRating + ", imdbVotes=" + imdbVotes + ", imdbID=" + imdbID + ", type=" + type
 				+ ", dvd=" + dvd + ", boxoffice=" + boxoffice + ", production=" + production + ", website=" + website
 				+ ", response=" + response + "]";
-	}
+	}*/
 
 
 	

@@ -1,18 +1,30 @@
 package pkg;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import org.hibernate.Session;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+@Transactional
 @Component
 public class DataLoader implements ApplicationRunner{
 
 	private MovieRepository movieModel;
 	private RestTemplate temp;
 	private static final String urlTITLE="http://www.omdbapi.com/?t=%s&apikey=29aac7aa";
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+	
 	
 	@Autowired
     public DataLoader(MovieRepository movieRepository) {
@@ -27,6 +39,13 @@ public class DataLoader implements ApplicationRunner{
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		//System.out.println(movieModel.count());
+		Session session=entityManager.unwrap(Session.class);
+		FullTextSession fullTextSession=Search.getFullTextSession(session);
+		fullTextSession.createIndexer()
+		   .purgeAllOnStart( true ) // true by default, highly recommended
+		   .optimizeAfterPurge( true ) // true is default, saves some disk space
+		   .optimizeOnFinish( true ) // true by default
+		   .start();
 		
 		if(this.movieModel.count()==0) {
 
