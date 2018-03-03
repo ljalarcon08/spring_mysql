@@ -143,7 +143,6 @@ public class Services {
 	@RequestMapping("/findTitleold")
 	public @ResponseBody ModelAndView findListByTitle(@RequestParam("pageSize") Optional<Integer> pageSize,
 			@RequestParam("page") Optional<Integer>page,@RequestParam("title") String title) {
-		//ModelAndView modelAndView=new ModelAndView("findList");
 		System.out.println(title);
 		int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
 		int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
@@ -252,7 +251,6 @@ public class Services {
 	}	
 	
 	private boolean validarMovie(String movie_id) {
-		//Collection<Movie2> movies= this.movieModel.findBymovieid(movie_id);
 		List<Movie2> movies=movieRepositoryService.findBymovieid(movie_id);
 		if(movies.size()>0) {
 			return true;
@@ -262,7 +260,6 @@ public class Services {
 	
 	@RequestMapping(method = RequestMethod.GET,path="/edit",produces = "application/json")
 	public String edit(@RequestParam String movieid, Model model) {
-		//Movie2 finded=movieModel.findBymovieid(movieid).iterator().next();
 		Movie2 finded=movieRepositoryService.findMovieById(movieid); 
 		model.addAttribute("movie",finded);
 		return "edit";
@@ -322,7 +319,6 @@ public class Services {
 	public ResponseEntity<?> updateMovie(@Valid @RequestBody Movie2 movie,@PathVariable String id) {
 		System.out.println(movie.getTitle());
 		movie.setMovieid(id);
-		//movieModel.save(movie);
 		movieRepositoryService.saveMovie(movie);
 		URI location=ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
 		return ResponseEntity.created(location).build();
@@ -331,7 +327,6 @@ public class Services {
 	@PostMapping(path="/api/movies")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<?> addMovie(@RequestBody Movie2 movie) {
-		//movieModel.save(movie);
 		movieRepositoryService.saveMovie(movie);
 		URI location=ServletUriComponentsBuilder
 				.fromCurrentRequest().replacePath("/movie/{id}")
@@ -342,7 +337,6 @@ public class Services {
 	@DeleteMapping(path="/api/movies/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteMovie(@PathVariable String id) {
-		//movieModel.delete(id);
 		movieRepositoryService.deleteMovie(id);
 	}
 	
