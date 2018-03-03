@@ -34,6 +34,29 @@ $(document).ready(function() {
 		}*/
 		
 	});
+	
+});
+
+$(document).on('click','.deleteButton',function(e){
+	if(confirm("Seguro de elminiar")){
+		var movieid=$(this).attr("id");
+		var host=window.location.host;
+		var rute=window.location.pathname.replace("/list","")
+		$.ajax({
+			headers:{
+				'Accept':'application/json',
+				'Content-type':'application/json'
+			},
+			'type':'DELETE',
+			'url':'http://'+host+rute+'/api/movies/'+movieid,
+			'dataType':'json',
+			'statusCode': {
+				204:function(xhr){
+					window.location.href ="http://"+host+rute+"/list";
+				}
+			}
+		});
+	}		
 });
 
 function getContextPath() {
@@ -43,13 +66,18 @@ function getContextPath() {
 function putData(page,rowCount){
 	var initial_path=getContextPath();
 	var host=window.location.host;
-	var urlComplete='http://'+host+initial_path+"/jsonPage?pageSize=5&page="+page;
+	var urlComplete='http://'+host;
 	if(initial_path.includes("findTitle")){
 		//console.log(window.location.href);
 		var actualUrl=new URL(window.location.href);
-		urlComplete+="&title="+actualUrl.searchParams.get("title");
+		initial_path=initial_path.replace("findTitle","");
+		urlComplete+=initial_path+"/movies/"+actualUrl.searchParams.get("title");
 		//console.log(urlComplete);
 	}
+	else{
+		urlComplete+=initial_path+"/movies";
+	}
+	urlComplete+="?pageSize=5&page="+page;
 	var tr = $('<tr />').appendTo($('#table'));
 	tr.append('<td id="wait" colspan="7"><i id="spinner" class="fas fa-spinner fa-spin"></i></td>');
 	$.get( urlComplete, function( data ) {
@@ -66,7 +94,7 @@ function putData(page,rowCount){
 				tr.append('<td>'+data.content[i].rating+'</td>');
 				tr.append('<td><img src="'+data.content[i].image+'"/></td>');
 				tr.append('<td><a class="btn btn-primary" href="/edit?movieid='+data.content[i].movieid+'">Actualizar</a></td>');
-			    tr.append('<td><form method="post" action="/del?movieid='+data.content[i].movieid+'"><input class="btn btn-danger" type="button" value="Eliminar" onclick="eliminar(this)"></input><input type="hidden" name="_method" value="DELETE"></input></form></td>');
+			    tr.append('<td><form id="delete_form"><input type="button" id="'+data.content[i].movieid+'" class="btn btn-danger buttonsp deleteButton" value="Eliminar"></input></form></td>');
 			}
 			//for (var i = 0; i < n_cols; ++i)
 				//tr.append($('<td />'));

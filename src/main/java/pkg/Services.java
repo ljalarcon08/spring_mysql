@@ -1,24 +1,34 @@
 package pkg;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import pkg.Movie2;
 import pkg.MovieRepository;;
@@ -43,6 +53,9 @@ public class Services {
 	private MoviePaginationService movieService;
 	
 	@Autowired
+	private MovieRepositoryServices movieRepositoryService;
+	
+	@Autowired
 	private HibernateSearchService hibernateSearchService;
 	
 	public Services(MoviePaginationService service) {
@@ -55,7 +68,7 @@ public class Services {
 	}
 	
 	@GetMapping(path="/all")
-	public @ResponseBody Iterable<Movie2> findall() {
+	public @ResponseBody List<Movie2> findall() {
 		return movieModel.findAll();
 	}
 	
@@ -95,16 +108,6 @@ public class Services {
 			return newMovie;
 		}
 		return null;
-	}
-	
-	@GetMapping(path="/rest",produces = "application/json")
-	public @ResponseBody String findone(@RequestParam String movieid) {
-		Movie2 newMovie=findMovieOMDB(movieid);
-		if(newMovie!=null) {
-			movieModel.save(newMovie);
-			return "{'msg':'UPT/INS'}";
-		}
-		return "{'msg':'Movie ID No existe'}";
 	}
 	
 	@RequestMapping("/helo")
@@ -203,9 +206,9 @@ public class Services {
 	}	
 
 	//find title in hibernate's index
-	@RequestMapping("/findTitle/jsonPage")
+	@RequestMapping("/movies/{title}")
 	public @ResponseBody Page<Movie2> searchListByTitleJson(@RequestParam("pageSize") Optional<Integer> pageSize,
-			@RequestParam("page") Optional<Integer>page,@RequestParam("title") String title) {
+			@RequestParam("page") Optional<Integer>page,@PathVariable("title") String title) {
 		System.out.println(title);
 		int evalPageSize = pageSize.orElse(INITIAL_PAGE_SIZE);
 		int evalPage = (page.orElse(0) < 1) ? INITIAL_PAGE : page.get() - 1;
@@ -214,7 +217,7 @@ public class Services {
 	}	
 	
 	
-	@GetMapping(path="/jsonPage",produces = "application/json")
+	@GetMapping(path="/movies",produces = "application/json")
 	public @ResponseBody Page<Movie2> jsonPage(@RequestParam("pageSize") Optional<Integer> pageSize,
 			@RequestParam("page") Optional<Integer> page) {
 		ModelAndView modelAndView = new ModelAndView("htmlList");
@@ -226,71 +229,21 @@ public class Services {
 	}	
 	
 	@GetMapping(path="/one",produces = "application/json")
-	public @ResponseBody Iterable<Movie2> saveofrequest(@RequestParam String movieid) {
+	public @ResponseBody List<Movie2> saveofrequest(@RequestParam String movieid) {
 		
-		return movieModel.findBymovieid(movieid);
-	}	
-	
-	
-	@GetMapping(path="/add",produces = "application/json")
-	public @ResponseBody String addMovieGet (@RequestParam String movie_id
-			, @RequestParam String image,@RequestParam String rating,
-			@RequestParam String release_year,@RequestParam String title) {
-
-		Movie2 movie = new Movie2();
-		movie.setMovieid(movie_id);
-		movie.setImage(image);
-		movie.setTitle(title);
-		movie.setRating(rating);
-		movie.setRelease_year(release_year);
-		movieModel.save(movie);
-		return "Saved";
-	}
-	
-	@RequestMapping(method = RequestMethod.POST,path="/add",produces = "application/json")
-	public @ResponseBody String addMoviePost(@RequestBody Movie2 movie){
-		if(!this.validarMovie(movie.getMovieid())) {
-			movieModel.save(movie);
-			return "{'msg':'ok'}";
-		}
-		else {
-			return "{'msg':'error'}";
-		}
-	}
-	
-	@RequestMapping(method = RequestMethod.DELETE,path="/del",produces = "text/html")
-	public @ResponseBody ModelAndView removeMovieList(@RequestParam String movieid){
-		System.out.println(movieid);
-		if(this.validarMovie(movieid)) {
-			Movie2 todel=getMovieById(movieid);
-			movieModel.delete(todel);
-		}
-		return new ModelAndView("redirect:/list");
-	}		
-	
-	@RequestMapping(method = RequestMethod.DELETE,path="/delete",produces = "application/json")
-	public @ResponseBody String removeMoviePost(@RequestParam String movieid){
-		System.out.println(movieid);
-		if(this.validarMovie(movieid)) {
-			Movie2 todel=getMovieById(movieid);
-			movieModel.delete(todel);
-			return "{'msg':'ok'}";
-		}
-		else {
-			return "{'msg':'error not found'}";
-		}
+		return movieRepositoryService.findBymovieid(movieid);
 	}	
 	
 	private Movie2 getMovieById(String movieid) {
-		return movieModel.findOneBymovieid(movieid);
+		return movieRepositoryService.findOneBymovieid(movieid);
 	}
 
 	private Movie2 getMovieByTitle(String title) {
-		return movieModel.findOneBytitle(title);
+		return movieRepositoryService.findMovieByTitle(title);
 	}
 	
 	private boolean validarMoviePorNombre(String title) {
-		Collection<Movie2> movies= this.movieModel.findBytitle(title);
+		List<Movie2> movies= movieRepositoryService.findMoviesByTitle(title);
 		System.out.println("SIZE:"+movies.size());
 		if(movies.size()>0) {
 			return true;
@@ -299,7 +252,8 @@ public class Services {
 	}	
 	
 	private boolean validarMovie(String movie_id) {
-		Collection<Movie2> movies= this.movieModel.findBymovieid(movie_id);
+		//Collection<Movie2> movies= this.movieModel.findBymovieid(movie_id);
+		List<Movie2> movies=movieRepositoryService.findBymovieid(movie_id);
 		if(movies.size()>0) {
 			return true;
 		}
@@ -308,9 +262,10 @@ public class Services {
 	
 	@RequestMapping(method = RequestMethod.GET,path="/edit",produces = "application/json")
 	public String edit(@RequestParam String movieid, Model model) {
-		 Movie2 finded=movieModel.findBymovieid(movieid).iterator().next();
-		 model.addAttribute("movie",finded);
-		 return "edit";
+		//Movie2 finded=movieModel.findBymovieid(movieid).iterator().next();
+		Movie2 finded=movieRepositoryService.findMovieById(movieid); 
+		model.addAttribute("movie",finded);
+		return "edit";
 	}
 	
 	@RequestMapping(method = RequestMethod.GET,path="/find",produces = "text/html")
@@ -361,36 +316,34 @@ public class Services {
 			}
 		}
 	}	
-	
-	@RequestMapping(method = RequestMethod.PUT,path="/upd",produces = "application/json")
-	public @ResponseBody String updateMovie(@RequestBody Movie2 movie){
-		if(!this.validarMovie(movie.getMovieid())) {
-			movieModel.save(movie);
-			return "{'msg':'insert ok'}";
-		}
-		else {
-			movieModel.save(movie);
-			return "{'msg':'update ok'}";
-		}
-	}	 
-	
-	@PutMapping(value="/update")
-	public @ResponseBody ModelAndView updateMov(@RequestParam String movieid,@RequestParam String title,
-			@RequestParam String release_year,@RequestParam String rating,@RequestParam String image){
-		Movie2 updatedMovie=new Movie2();
-		updatedMovie.setMovieid(movieid);
-		updatedMovie.setTitle(title);
-		updatedMovie.setRelease_year(release_year);
-		updatedMovie.setRating(rating);
-		updatedMovie.setImage(image);
-		if(!this.validarMovie(updatedMovie.getMovieid())) {
-			movieModel.save(updatedMovie);
-			return new ModelAndView("redirect:/list");
-		}
-		else {
-			movieModel.save(updatedMovie);
-			return new ModelAndView("redirect:/list");
-		}
-	}	 
 
+	@PutMapping(path="/api/movies/{id}")
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<?> updateMovie(@Valid @RequestBody Movie2 movie,@PathVariable String id) {
+		System.out.println(movie.getTitle());
+		movie.setMovieid(id);
+		//movieModel.save(movie);
+		movieRepositoryService.saveMovie(movie);
+		URI location=ServletUriComponentsBuilder.fromCurrentRequest().build().toUri();
+		return ResponseEntity.created(location).build();
+	}
+	
+	@PostMapping(path="/api/movies")
+	@ResponseStatus(HttpStatus.CREATED)
+	public ResponseEntity<?> addMovie(@RequestBody Movie2 movie) {
+		//movieModel.save(movie);
+		movieRepositoryService.saveMovie(movie);
+		URI location=ServletUriComponentsBuilder
+				.fromCurrentRequest().replacePath("/movie/{id}")
+				.buildAndExpand(movie.getMovieid()).toUri();
+		return ResponseEntity.created(location).build();
+	}
+	
+	@DeleteMapping(path="/api/movies/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deleteMovie(@PathVariable String id) {
+		//movieModel.delete(id);
+		movieRepositoryService.deleteMovie(id);
+	}
+	
 }
